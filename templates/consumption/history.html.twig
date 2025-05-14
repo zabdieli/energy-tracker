@@ -1,0 +1,32 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Historique de consommation{% endblock %}
+
+{% block body %}
+    <h1>📊 Historique de consommation</h1>
+
+    <canvas id="consumptionChart" width="400" height="200"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const ctx = document.getElementById('consumptionChart').getContext('2d');
+
+        const data = {
+            labels: {{ records|map(r => r.date.format('Y-m-d'))|json_encode|raw }},
+            datasets: [{
+                label: 'Consommation (kWh)',
+                data: {{ records|map(r => r.value)|json_encode|raw }},
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.2,
+                fill: false,
+            }]
+        };
+
+        const config = {
+            type: 'line',
+            data: data,
+        };
+
+        new Chart(ctx, config);
+    </script>
+{% endblock %}

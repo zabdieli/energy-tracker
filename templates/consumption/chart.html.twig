@@ -1,0 +1,66 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Graphique des Consommations{% endblock %}
+
+{% block body %}
+<div class="container">
+    <h1>📊 Historique des consommations</h1>
+
+    <canvas id="consumptionChart" width="400" height="200"></canvas>
+</div>
+
+<!-- Chart.js via CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const months = {{ months|json_encode|raw }};
+    const rawData = {{ data|json_encode|raw }};
+    const datasets = [];
+
+    console.log("MONTHS:", months);
+    console.log("RAWDATA:", rawData);
+
+    for (const category in rawData) {
+        datasets.push({
+            label: category,
+            data: months.map(month => rawData[category][month] ?? 0),
+            borderWidth: 1,
+            fill: false,
+            tension: 0.2
+        });
+    }
+
+    const ctx = document.getElementById('consumptionChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: datasets
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Consommations mensuelles par catégorie'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Consommation'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Mois'
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}
