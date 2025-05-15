@@ -61,7 +61,7 @@ final class ConsumptionController extends AbstractController
 
         foreach ($records as $record) {
             $category = $record->getCategory()->getName();
-            $month = $record->getDate()->format('Y-m'); // ex : 2024-05
+            $month = $record->getDate()->format('Y-m'); 
 
             if (!isset($data[$category])) {
                 $data[$category] = [];

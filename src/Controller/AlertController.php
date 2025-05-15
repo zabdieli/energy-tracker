@@ -15,44 +15,37 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use App\Form\ConsumptionRecordForm;
 use App\Form\GoalForm;
-
 final class AlertController extends AbstractController
 {
     #[Route('/alerts', name: 'alerts')]
-public function index(ConsumptionRecordRepository $recordRepo, GoalRepository $goalRepo, Security $security): Response
-{
-    $user = $security->getUser();
-    $alerts = [];
+    public function index(ConsumptionRecordRepository $recordRepo, GoalRepository $goalRepo, Security $security): Response
+    {
+        $user = $security->getUser();
+        $alerts = [];
 
-    // Regrouper les consommations par catégorie et mois
-    $records = $recordRepo->findBy(['user' => $user]);
-    $grouped = [];
+        // On récupère tous les enregistrements de consommation de l'utilisateur
+        $records = $recordRepo->findBy(['user' => $user]);
 
-    foreach ($records as $record) {
-        $month = $record->getDate()->format('Y-m');
-        $cat = $record->getCategory()->getName();
-
-        $grouped[$cat][$month] = ($grouped[$cat][$month] ?? 0) + $record->getValue();
-    }
-
-    // Comparer aux objectifs
-    $goals = $goalRepo->findBy(['user' => $user]);
-
-    foreach ($goals as $goal) {
-        $cat = $goal->getCategory()->getName();
-        $month = $goal->getMonth();
-        $consumed = $grouped[$cat][$month] ?? 0;
-
-        if ($consumed > $goal->getTargetAmount()) {
-            $alerts[] = "🚨 Dépassement : $cat en $month ($consommé vs objectif {$goal->getTargetAmount()})";
+        // On récupère l'objectif avec la limite de consommation fixée
+        $goal = $goalRepo->findOneBy(['user' => $user]);
+        if (!$goal) {
+            throw new \Exception("Aucun objectif trouvé pour cet utilisateur.");
         }
+
+        // Supposons que la méthode getLimite() retourne la limite personnalisée en kWh
+        $customLimit = $goal->getLimite();
+
+        foreach ($records as $record) {
+            $value = $record->getValue();
+            $dateTime = $record->getDate()->format('Y-m-d');
+
+            if ($value > $customLimit) {
+                $alerts[] = "⚠️ Alerte à $dateTime : consommation de {$value} kWh (limite : $customLimit kWh)";
+            }
+        }
+
+        return $this->render('alert/index.html.twig', [
+            'alerts' => $alerts,
+        ]);
     }
-
-    // Optionnel : détecter une hausse brutale par rapport au mois précédent
-
-    return $this->render('alert/index.html.twig', [
-        'alerts' => $alerts,
-    ]);
-}
-
 }

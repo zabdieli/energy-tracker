@@ -14,7 +14,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/goal')]
 final class GoalController extends AbstractController
 {
-    #[Route(name: 'app_goal_index', methods: ['GET'])]
+    #[Route(name: 'goal', methods: ['GET'])]
     public function index(GoalRepository $goalRepository): Response
     {
         return $this->render('goal/index.html.twig', [

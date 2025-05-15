@@ -19,41 +19,55 @@ class OdreApiService
     }
 
     public function fetchAndStoreElectricityData(): void
-    {
-        $response = $this->client->request(
-            'GET',
-            'https://odre.opendatasoft.com/api/explore/v2.1/catalog/datasets/consommation-quotidienne-brute/records?limit=30&order_by=date'
-        );
+{
+    $url = 'https://odre.opendatasoft.com/api/records/1.0/search/?dataset=eco2mix-national-tr&rows=300';
 
-        $data = $response->toArray();
+    $response = $this->client->request('GET', $url);
+    $data = $response->toArray();
 
-        $category = $this->em->getRepository(Category::class)->findOneBy(['name' => 'Électricité']);
+    $records = $data['records'] ?? [];
+
+    foreach ($records as $item) {
+        $fields = $item['fields'] ?? null;
+
+        if (!$fields || !isset($fields['date_heure'], $fields['consommation'], $fields['nature'])) {
+            continue;
+        }
+
+        $datetime = new \DateTime($fields['date_heure']);
+        $value = $fields['consommation'];
+        $categoryName = ucfirst(trim($fields['nature']));
+
+        // Cherche ou crée la catégorie dynamiquement
+        $category = $this->em->getRepository(Category::class)->findOneBy(['name' => $categoryName]);
         if (!$category) {
-            throw new \Exception('La catégorie "Électricité" n\'existe pas.');
+            $category = new Category();
+            $category->setName($categoryName);
+            $this->em->persist($category);
         }
 
-        foreach ($data['results'] as $item) {
-            $date = new \DateTime($item['date']);
+        // Évite les doublons
+        $existing = $this->em->getRepository(ConsumptionRecord::class)->findOneBy([
+            'date' => $datetime,
+            'category' => $category,
+            'user' => null,
+        ]);
 
-            $existing = $this->em->getRepository(ConsumptionRecord::class)->findOneBy([
-                'date' => $date,
-                'category' => $category,
-                'user' => null,
-            ]);
-
-            if ($existing) {
-                continue;
-            }
-
-            $record = new ConsumptionRecord();
-            $record->setDate($date);
-            $record->setValue($item['consommation_brute_electricite_rte'] ?? 0);
-            $record->setCategory($category);
-            $record->setUser(null); // ou un utilisateur par défaut
-
-            $this->em->persist($record);
+        if ($existing) {
+            continue;
         }
 
-        $this->em->flush();
+        // Crée un nouvel enregistrement
+        $record = new ConsumptionRecord();
+        $record->setDate($datetime);
+        $record->setValue($value);
+        $record->setCategory($category);
+        $record->setUser(null);
+        $this->em->persist($record);
     }
+
+    $this->em->flush();
+}
+
+
 }
