@@ -9,8 +9,9 @@ final class AlertControllerTest extends WebTestCase
     public function testIndex(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/alert');
+        $client->request('GET', '/alerts');
 
         self::assertResponseIsSuccessful();
     }
+
 }

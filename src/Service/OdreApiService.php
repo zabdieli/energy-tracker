@@ -38,7 +38,7 @@ class OdreApiService
         $value = $fields['consommation'];
         $categoryName = ucfirst(trim($fields['nature']));
 
-        // Cherche ou crée la catégorie dynamiquement
+        
         $category = $this->em->getRepository(Category::class)->findOneBy(['name' => $categoryName]);
         if (!$category) {
             $category = new Category();
@@ -46,7 +46,7 @@ class OdreApiService
             $this->em->persist($category);
         }
 
-        // Évite les doublons
+       
         $existing = $this->em->getRepository(ConsumptionRecord::class)->findOneBy([
             'date' => $datetime,
             'category' => $category,
@@ -57,7 +57,7 @@ class OdreApiService
             continue;
         }
 
-        // Crée un nouvel enregistrement
+        
         $record = new ConsumptionRecord();
         $record->setDate($datetime);
         $record->setValue($value);

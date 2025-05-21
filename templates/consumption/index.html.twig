@@ -3,10 +3,36 @@
 {% block title %}Nouvelle consommation{% endblock %}
 
 {% block body %}
-    <h1>Saisir une consommation</h1>
+    <div class="container mt-5">
+        <h1 class="mb-4">Saisir une consommation</h1>
 
-    {{ form_start(form) }}
-        {{ form_widget(form) }}
-        <button class="btn btn-primary">Enregistrer</button>
-    {{ form_end(form) }}
+        <div class="card shadow rounded-4 p-4">
+            {{ form_start(form) }}
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    {{ form_label(form.date) }}
+                    {{ form_widget(form.date, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.date) }}
+                </div>
+                <div class="col-md-6">
+                    {{ form_label(form.value) }}
+                    {{ form_widget(form.value, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.value) }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                {{ form_label(form.category) }}
+                {{ form_widget(form.category, {'attr': {'class': 'form-select'}}) }}
+                {{ form_errors(form.category) }}
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-success w-100">Enregistrer</button>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
 {% endblock %}

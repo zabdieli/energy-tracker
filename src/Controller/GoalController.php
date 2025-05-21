@@ -14,13 +14,14 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/goal')]
 final class GoalController extends AbstractController
 {
-    #[Route(name: 'goal', methods: ['GET'])]
+    #[Route('/', name: 'app_goal_index', methods: ['GET'])]
     public function index(GoalRepository $goalRepository): Response
     {
         return $this->render('goal/index.html.twig', [
             'goals' => $goalRepository->findAll(),
         ]);
     }
+
 
     #[Route('/new', name: 'app_goal_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager): Response

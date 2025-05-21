@@ -1,6 +1,6 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello AlertController!{% endblock %}
+{% block title %}Alertes de consommation{% endblock %}
 
 {% block body %}
 <style>
@@ -9,16 +9,18 @@
 </style>
 
 <div class="example-wrapper">
-    <h1>🔔 Alertes de consommation</h1>
+    <h1><i class="bi bi-bell-fill"></i> Alertes de consommation</h1>
 
-{% if alerts is empty %}
-    <p>✅ Aucune alerte détectée.</p>
-{% else %}
-    <ul class="list-group">
-        {% for alert in alerts %}
-            <li class="list-group-item list-group-item-danger">{{ alert }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
+    {% if alerts is empty %}
+        <p><i class="bi bi-check-circle-fill text-success"></i> Aucune alerte détectée.</p>
+    {% else %}
+        <ul class="list-group">
+            {% for alert in alerts %}
+                <li class="list-group-item list-group-item-danger">
+                    <i class="bi bi-exclamation-triangle-fill"></i> {{ alert }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
 </div>
 {% endblock %}

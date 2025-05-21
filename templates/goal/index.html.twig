@@ -1,17 +1,22 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Goal index{% endblock %}
+{% block title %}Objectifs{% endblock %}
 
 {% block body %}
-    <h1>Goal index</h1>
+<div class="container mt-5">
+    <h1 class="mb-4">Liste des objectifs</h1>
 
-    <table class="table">
+    <a href="{{ path('app_goal_new') }}" class="btn btn-success mb-3">
+        <i class="bi bi-plus-circle"></i> Nouvel objectif
+    </a>
+
+    <table class="table table-striped">
         <thead>
             <tr>
-                <th>Id</th>
-                <th>Month</th>
+                <th>ID</th>
+                <th>Mois</th>
                 <th>Limite</th>
-                <th>actions</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -21,17 +26,26 @@
                 <td>{{ goal.month }}</td>
                 <td>{{ goal.limite }}</td>
                 <td>
-                    <a href="{{ path('app_goal_show', {'id': goal.id}) }}">show</a>
-                    <a href="{{ path('app_goal_edit', {'id': goal.id}) }}">edit</a>
+                    <a href="{{ path('app_goal_show', {'id': goal.id}) }}" class="btn btn-primary btn-sm">
+                        <i class="bi bi-eye"></i> Voir
+                    </a>
+                    <a href="{{ path('app_goal_edit', {'id': goal.id}) }}" class="btn btn-warning btn-sm">
+                        <i class="bi bi-pencil-square"></i> Modifier
+                    </a>
+                    <form method="post" action="{{ path('app_goal_delete', {'id': goal.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet objectif ?');" style="display:inline;">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ goal.id) }}">
+                        <button class="btn btn-danger btn-sm">
+                            <i class="bi bi-trash"></i> Supprimer
+                        </button>
+                    </form>
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="4">no records found</td>
+                <td colspan="4" class="text-center">Aucun objectif trouvé</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
-
-    <a href="{{ path('app_goal_new') }}">Create new</a>
+</div>
 {% endblock %}
