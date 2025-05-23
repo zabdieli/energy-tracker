@@ -51,6 +51,10 @@ docker-compose stop
 ```bash
 docker-compose up -d
 ```
+### ouvrir un terminal dans le conteneur mysql
+```bash
+docker exec -it mysql_db mysql -u root -proot symfony
+```
 ### Supprimer complètement les conteneurs et volumes (attention, supprime les données)
 ```bash
 docker-compose down -v
